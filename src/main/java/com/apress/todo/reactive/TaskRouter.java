@@ -15,15 +15,15 @@ import org.springframework.web.reactive.function.server.ServerResponse;
  * @author max.dokuchaev
  */
 @Configuration
-public class ToDoRouter {
+public class TaskRouter {
 
   @Bean
-  public RouterFunction<ServerResponse> monoRouterFunction(ToDoHandler toDoHandler) {
+  public RouterFunction<ServerResponse> monoRouterFunction(TaskHandler taskHandler) {
     return route(GET("/todo/{id}").and(accept(APPLICATION_JSON)),
-        toDoHandler::getToDo)
+        taskHandler::getToDo)
         .andRoute(GET("/todo").and(accept(APPLICATION_JSON)),
-            toDoHandler::getToDos)
+            taskHandler::getAllTask)
         .andRoute(POST("/todo").and(accept(APPLICATION_JSON)),
-            toDoHandler::newToDo);
+            taskHandler::createNewTask);
   }
 }

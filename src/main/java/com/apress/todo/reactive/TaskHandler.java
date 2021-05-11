@@ -6,8 +6,8 @@ import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static org.springframework.web.reactive.function.server.ServerResponse.notFound;
 import static reactor.core.publisher.Mono.fromSupplier;
 
-import com.apress.todo.domain.ToDo;
-import com.apress.todo.repository.ToDoRepository;
+import com.apress.todo.domain.Task;
+import com.apress.todo.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -20,17 +20,18 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @RequiredArgsConstructor
-public class ToDoHandler {
+public class TaskHandler {
 
-  private final ToDoRepository repository;
+  private final TaskRepository repository;
 
 
   public Mono<ServerResponse> getToDo(ServerRequest request) {
-    return findById(request.pathVariable("id"));
+    return findTaskById(request.pathVariable("id"));
   }
 
-  private Mono<ServerResponse> findById(String id) {
-    Mono<ToDo> toDo = repository.findById(id);
+
+  private Mono<ServerResponse> findTaskById(String id) {
+    Mono<Task> toDo = repository.findById(id);
     Mono<ServerResponse> notFound = notFound().build();
     return toDo.flatMap(t -> ServerResponse
         .ok()
@@ -39,29 +40,29 @@ public class ToDoHandler {
         .switchIfEmpty(notFound);
   }
 
-  public Mono<ServerResponse> getToDos(ServerRequest request) {
-    Flux<ToDo> toDos = repository.findAll();
+  public Mono<ServerResponse> getAllTask(ServerRequest request) {
+    Flux<Task> toDos = repository.findAll();
     return ServerResponse
         .ok()
         .contentType(APPLICATION_JSON)
-        .body(toDos, ToDo.class);
+        .body(toDos, Task.class);
   }
 
-  public Mono<ServerResponse> newToDo(ServerRequest request) {
-    Mono<ToDo> toDo = request.bodyToMono(ToDo.class);
+  public Mono<ServerResponse> createNewTask(ServerRequest request) {
+    Mono<Task> toDo = request.bodyToMono(Task.class);
     return ServerResponse
         .ok()
         .contentType(APPLICATION_JSON)
-        .body(fromPublisher(toDo.flatMap(this::save), ToDo.class));
+        .body(fromPublisher(toDo.flatMap(this::saveTask), Task.class));
   }
 
-  private Mono<ToDo> save(ToDo toDo) {
+  private Mono<Task> saveTask(Task task) {
     return fromSupplier(
         () -> {
           repository
-              .save(toDo)
+              .save(task)
               .subscribe();
-          return toDo;
+          return task;
         });
   }
 }

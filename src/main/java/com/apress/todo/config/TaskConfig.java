@@ -3,8 +3,8 @@ package com.apress.todo.config;
 import static com.mongodb.reactivestreams.client.MongoClients.create;
 import static java.lang.System.out;
 
-import com.apress.todo.domain.ToDo;
-import com.apress.todo.repository.ToDoRepository;
+import com.apress.todo.domain.Task;
+import com.apress.todo.repository.TaskRepository;
 import com.mongodb.reactivestreams.client.MongoClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -22,7 +22,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @Configuration
 @EnableReactiveMongoRepositories(basePackages = "com.apress.todo.repository")
 @RequiredArgsConstructor
-public class ToDoConfig extends AbstractReactiveMongoConfiguration {
+public class TaskConfig extends AbstractReactiveMongoConfiguration {
 
   private final Environment environment;
 
@@ -40,12 +40,12 @@ public class ToDoConfig extends AbstractReactiveMongoConfiguration {
   }
 
   @Bean
-  public CommandLineRunner insertAndView(ToDoRepository repository, ApplicationContext context) {
+  public CommandLineRunner insertAndView(TaskRepository repository, ApplicationContext context) {
     return args -> {
-      repository.save(new ToDo("Do homework")).subscribe();
-      repository.save(new ToDo("Workout in the mornings", true)).subscribe();
-      repository.save(new ToDo("Make dinner tonight")).subscribe();
-      repository.save(new ToDo("Clean the studio", true)).subscribe();
+      repository.save(new Task("Do homework")).subscribe();
+      repository.save(new Task("Workout in the mornings", true)).subscribe();
+      repository.save(new Task("Make dinner tonight")).subscribe();
+      repository.save(new Task("Clean the studio", true)).subscribe();
       repository.findAll().subscribe(out::println);
     };
   }
